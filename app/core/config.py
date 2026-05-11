@@ -19,6 +19,17 @@ class Settings(BaseSettings):
     host: str = "0.0.0.0"
     port: int = 8000
 
+    public_base_url: HttpUrl = "https://example.com"
+
+    openai_api_key: SecretStr = SecretStr("sk-placeholder")
+    openai_realtime_model: str = Field(default="gpt-4o-realtime-preview", min_length=1)
+
+    twilio_account_sid: str = Field(default="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", min_length=1)
+    twilio_auth_token: SecretStr = SecretStr("twilio-placeholder-token")
+    twilio_phone_number: str = "+15551234567"
+    owner_phone_number: str = "+15557654321"
+
+    database_url: SecretStr = SecretStr("postgresql://user:password@localhost:5432/personal_phone_agent")
     public_base_url: HttpUrl
 
     openai_api_key: SecretStr
