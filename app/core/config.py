@@ -30,6 +30,17 @@ class Settings(BaseSettings):
     owner_phone_number: str = "+15557654321"
 
     database_url: SecretStr = SecretStr("postgresql://user:password@localhost:5432/personal_phone_agent")
+    public_base_url: HttpUrl
+
+    openai_api_key: SecretStr
+    openai_realtime_model: str = Field(min_length=1)
+
+    twilio_account_sid: str = Field(min_length=1)
+    twilio_auth_token: SecretStr
+    twilio_phone_number: str
+    owner_phone_number: str
+
+    database_url: SecretStr
 
     model_config = SettingsConfigDict(
         env_file=".env",
