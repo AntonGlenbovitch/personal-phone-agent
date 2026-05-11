@@ -1,19 +1,49 @@
+from enum import Enum
 from functools import lru_cache
 
-from dotenv import load_dotenv
+from pydantic import Field, HttpUrl, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-load_dotenv()
+
+class AppEnv(str, Enum):
+    development = "development"
+    staging = "staging"
+    production = "production"
+    test = "test"
 
 
 class Settings(BaseSettings):
     app_name: str = "Personal Phone Agent"
-    app_env: str = "development"
+    app_env: AppEnv = AppEnv.development
     app_debug: bool = True
     host: str = "0.0.0.0"
     port: int = 8000
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    public_base_url: HttpUrl
+
+    openai_api_key: SecretStr
+    openai_realtime_model: str = Field(min_length=1)
+
+    twilio_account_sid: str = Field(min_length=1)
+    twilio_auth_token: SecretStr
+    twilio_phone_number: str
+    owner_phone_number: str
+
+    database_url: SecretStr
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+    )
+
+    @field_validator("twilio_phone_number", "owner_phone_number")
+    @classmethod
+    def validate_e164_number(cls, value: str) -> str:
+        if not value.startswith("+") or not value[1:].isdigit() or len(value) < 8:
+            raise ValueError("must be a valid E.164-style phone number")
+        return value
 
 
 @lru_cache(maxsize=1)
